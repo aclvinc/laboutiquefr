@@ -1,0 +1,183 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement de la commande{% endblock %}
+
+{% block scripts %}
+    <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+
+{% block content %}
+    <div class='container'>
+        <h2>VERIFICATION</h2>
+        <p>Vérifier votre commande avant l'achat définitif</p>
+
+        <hr>
+
+        <div class="row">
+        
+            <div class="col col-md-7">
+                <strong>Le transporteur :</strong>
+                <div class="row">                   
+                    <div class="col col-5">{{ order.carrierName }}</div>
+                    <div class="col col-3">{{ (order.carrierPrice / 100)|number_format('2', ',', ' ') }}&nbsp;€</div>
+                </div>    
+                <hr>
+                <strong>Votre adresse :</strong>                
+                <div class="row"> 
+                    <div class="col col-5">{{ order.adressDelivery|raw }}</div>
+                </div>                         
+            </div>
+        
+            <div class="col col-md-5">
+                <div class="text-center">
+                    <b>Votre commande</b>
+                    <p>La liste de vos produits</p>
+                </div>
+                <div class="order-summary">
+                    {% set subtotal = 0 %}
+                    {% for key, product in products %}
+                        {% set subtotal = subtotal + product.total_item %}
+                        <div class="row {% if key > 0%}mt-2{% endif %}">
+                            <div class="col col-3">
+                                <img src="{{ asset(product['p'].illustrationPath) }}" alt="{{ product['p'].name }}"  height="75px">
+                            </div>
+
+                            <div class="col col-6 my-auto">
+                                <b>{{ product['p'].name}} </b>&nbsp;<small>x {{ product['qty'] }}</small><br>
+                                <small>{{ product['p'].subtitle }}</small>
+                            </div>
+                            <div class="col col-2 text-right my-auto">
+                                <b>{{ (product.total_item/100)|number_format('2', ',', ' ') }}&nbsp;€</b>   
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col col-2"></div>
+                    <div class="col col-6"><strong>Sous-total :</strong></div>
+                    <div class="col col-3 text-right">{{ ( subtotal / 100)|number_format('2', ',', ' ') }}&nbsp;€</div>
+                </div>
+                <div class="row">
+                    <div class="col col-2"></div>
+                    <div class="col col-6"><strong>Transport : </strong></div>
+                    <div class="col col-3 text-right">{{ ( order.carrierPrice / 100)|number_format('2', ',', ' ') }}&nbsp;€</div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col col-2"></div>
+                    <div class="col col-6"><strong>Total à payer : </strong></div>
+                    <div class="col col-3 text-right"><b>{{ (( subtotal + order.carrierPrice ) / 100)|number_format('2', ',', ' ') }}</b>&nbsp;€</div>
+                </div>                
+
+                <form action="/command/checkout/{{ reference }}" method="POST">
+                    <button class="btn btn-block btn-info mt-4" type="submit" id="checkout-button">Payer</button>
+                </form>
+                {#<a href="" class="btn btn-block btn-info mt-4">Payer</a> #}           
+            
+            </div>
+
+        </div>
+    
+    </div>
+
+{% endblock %}
+
+{#
+        <div class="col-lg-8 delivery px-md-3 px-1">
+            <p class="pt-4 fw-bold pb-3 ps-2">Delivery</p>
+            <div class="d-md-flex justify-content-between align-items-center pb-4">
+                <div class="size d-flex ps-4"> <label class="option d-flex align-items-center"> <input type="radio" name="radio">
+                        <div class="card">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center"> <img class="del" src="https://www.freepnglogos.com/uploads/ups-logo-transparent/ups-airlines-aviation-22.png" alt="">
+                                    <p class="ps-2">DPD</p>
+                                </div>
+                                <div class=" d-flex flex-column px-3">
+                                    <p class="fw-bold pb-1">DPD<span>Deliveries</span></p> <small class="text-muted pb-1">Expected<span class="ps-1">delivery:</span></small> <small class="text-muted pb-1">Friday:28</small>
+                                </div>
+                                <p class="fw-bold">$5.25</p>
+                            </div>
+                        </div> <span class="checkmark"></span>
+                    </label> </div>
+                <div class="size d-flex pt-md-0 pt-3 ps-md-0 ps-4"> <label class="option d-flex align-items-center"> <input type="radio" name="radio">
+                        <div class="card">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center"> <img class="del" src="https://www.freepnglogos.com/uploads/ups-logo-transparent/ups-airlines-aviation-22.png" alt="">
+                                    <p class="ps-2">DPD</p>
+                                </div>
+                                <div class=" d-flex flex-column px-3">
+                                    <p class="fw-bold pb-1">DPD<span>Deliveries</span></p> <small class="text-muted pb-1">Expected<span class="ps-1">delivery:</span></small> <small class="text-muted pb-1">Friday:28</small>
+                                </div>
+                                <p class="fw-bold">$5.25</p>
+                            </div>
+                        </div> <span class="checkmark"></span>
+                    </label> </div>
+            </div>
+            <div class="d-md-flex justify-content-between align-items-center pb-4">
+                <div class="size d-flex ps-4"> <label class="option d-flex align-items-center"> <input type="radio" name="radio">
+                        <div class="card">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center"> <img class="del" src="https://www.freepnglogos.com/uploads/ups-logo-transparent/ups-airlines-aviation-22.png" alt="">
+                                    <p class="ps-2">DPD</p>
+                                </div>
+                                <div class=" d-flex flex-column px-3">
+                                    <p class="fw-bold pb-1">DPD<span>Deliveries</span></p> <small class="text-muted pb-1">Expected<span class="ps-1">delivery:</span></small> <small class="text-muted pb-1">Friday:28</small>
+                                </div>
+                                <p class="fw-bold">$5.25</p>
+                            </div>
+                        </div> <span class="checkmark"></span>
+                    </label> </div>
+                <div class="size d-flex pt-md-0 pt-3 ps-md-0 ps-4"> <label class="option d-flex align-items-center"> <input type="radio" name="radio">
+                        <div class="card">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center"> <img class="del" src="https://www.freepnglogos.com/uploads/ups-logo-transparent/ups-airlines-aviation-22.png" alt="">
+                                    <p class="ps-2">DPD</p>
+                                </div>
+                                <div class=" d-flex flex-column px-3">
+                                    <p class="fw-bold pb-1">DPD<span>Deliveries</span></p> <small class="text-muted pb-1">Expected<span class="ps-1">delivery:</span></small> <small class="text-muted pb-1">Friday:28</small>
+                                </div>
+                                <p class="fw-bold">$5.25</p>
+                            </div>
+                        </div> <span class="checkmark"></span>
+                    </label> </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <p class="pt-4 fw-bold pb-3">Additional Service</p>
+            <div class="card p-3 mb-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="fw-bold">Care + package</p> <small class="text-muted">One year of additional Care</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <p class="pe-3">$10.00</p>
+                        <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="SwitchCheck"> </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-3 mb-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="fw-bold">Environment Friendly</p> <small class="text-muted">Add some tip for earth care</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <p class="pe-3">$2.00</p>
+                        <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="SwitchCheck"> </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-3 mb-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="fw-bold">Golden Guard</p> <small class="text-muted">30 days more for return</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <p class="pe-3">$5.00</p>
+                        <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="SwitchCheck"> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+#}

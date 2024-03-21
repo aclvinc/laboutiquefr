@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gérer vos adresses{% endblock %}
+
+{% block content %}
+{#{ dump(app.user.adresses) }#}
+<section class="h-100 h-custom" style="background-color: #eee;">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col">
+        <div class="card">
+          <div class="card-body p-4">
+
+            <div class="row">
+
+              <div class="col-lg-10">
+                <h5 class="mb-3"><a href="{{ path('app_account') }}" class="text-body">
+                      <i class="fa-solid fa-arrow-left"></i>&nbsp;Revenir à mon compte !</a></h5>
+                <hr>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <p class="mb-1">La liste de mes adresses</p>
+                    {% if not app.user or app.user.adresses|length == 0 %}
+                        <p class="mb-0">&nbsp;</p>
+                    {% else %}
+                        <p class="mb-0">Vous avez {{ app.user.adresses|length }} adresses</p>
+                    {% endif %}
+                    
+                  </div>
+                  <div>
+                    <p class="mb-0">
+                        <a href="{{ path('app_account_adress_add') }}" type="button" class="btn btn-success btn-sm">
+                            Ajouter une adresse&nbsp;
+                            <i class="fa-solid fa-address-card"></i>
+                        </a>
+                    </p>
+                  </div>
+                </div>
+
+                {% if not app.user or app.user.adresses|length == 0 %}
+                    <p>
+                        Vous n'avez pas encore ajouté d'adresse ! Pour en ajouter une, cliquez <a href="{{ path('app_account_adress_add') }}">ici</a>.
+                    </p>
+                {% else %}
+                  {% for item in app.user.adresses %}
+                      <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                              <div class="d-flex flex-row align-items-center">
+                                  <div>
+                                  <img
+                                      src="{{ asset("assets/images/enveloppe.jpg") }}"
+                                      class="img-fluid rounded-3" alt="Shopping item" style="width: 65px;">
+                                  </div>
+                                  <div class="ms-3">
+                                    <h5>{{ item.name }}</h5>
+                                    <p class="small mb-0">{{ item.firstname }} - {{ item.lastname }}</p>                            
+                                  </div>
+                              </div>
+                              <div class="d-flex flex-row align-items-center">
+                                  <div style="width: 150px;">
+                                  <p class="text-sm-start text-wrap mb-0">{{ item.adress }}</p> 
+                                </div>
+                                <div style="width: 220px;">
+                                  <h5 class="mb-0 fs-6"><i class="fa-solid fa-phone"></i> +{{ item.indic}} {{ item.phone }}</h5>                                  
+                                </div>
+                                <a href="{{ path('app_account_adress_modify', {'id' : item.id }) }}" style="color: #cecece;"><i class="fa-solid fa-user-pen"></i></a>
+                                &nbsp;|&nbsp;
+                                <a href="{{ path('app_account_adress_delete', {'id' : item.id }) }}" style="color: #cecece;"><i class="fas fa-trash-alt"></i></a>
+                              </div>
+                            </div>
+                        </div>
+                      </div>         
+                  {% endfor %}
+
+                {% endif %}
+                {#
+                {% set total = 0 %}
+#}
+
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

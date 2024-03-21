@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail produit - {% endblock %}
+
+{% block content %}
+
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-6">
+            <img src="{{ asset(product.getIllustrationPath()) }}" class="img-fluid" alt="{{ product.name }}">
+        </div>
+        <div class="col-lg-6">
+            <h2 class="fw-bold">{{ product.name}}</h2>
+            <h6>{{ product.subtitle }}</h6>
+            <p class="text-muted">Catégorie : {{ product.category }}</p>
+            <h3 class="my-4">{{ (product.price/100)|number_format('2', ',', ' ') }} €</h3>
+            <p class="mb-4">{{ product.description }}</p>
+            {{ form_start(form) }}            
+                <div class="d-flex gap-3 mb-4">
+                    <input
+                        type="number"
+                        name="{{ field_name(form.quantity) }}"
+                        value="1"
+                        class="form-control" style="max-width: 80px;"
+                    >  
+                    {{ form_widget(form.submit, {'attr': {'class': 'btn btn-primary ml-4'}}) }}                                   
+                {#
+                <input type="number" class="form-control" value="1" style="max-width: 80px;">
+                <button class="btn btn-primary" type="button">Ajouter au panier</button>#}
+                </div>
+            {{ form_end(form) }}  
+           <div>
+                <a class="btn btn-outline-secondary btn-sm" href="{{ path('app_add_to_cart', {'id' : product.id}) }}" type="button">Ajouter à la liste de souhaits</a>
+                <a href="{{ path('app_products') }}" class="btn btn-outline-success btn-sm" type="button">Retour aux produits</a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

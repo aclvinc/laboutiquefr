@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nos produits - {% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    
+    <div class="row">
+        <div class="col-md-3">
+            <h4>Filtrer</h4>
+            {{ form_start(form) }}
+                {{ form_row(form.string) }}    
+            {{ form_end(form) }}
+        </div>
+        <div class="col-md-9">
+            <h4>Nos Produits ✅</h4>
+            <div class="row mt-4">
+                {% for product in products %}
+
+                {% set index = ( index | default(0) ) + 1 %}
+
+                <div class="col-md-4 mb-4">
+                    <div class="card" style="width: 16rem; min-height:400px;">
+                        <img src="{{ asset(product.getIllustrationPath() )}}" class="card-img-top" alt="{{ product.name }}">
+                        <div class="card-body product-item">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ product.subtitle }}</h6>
+
+                            <a href="{{ path('app_product', {'slug':product.slug}) }}" class="btn btn-success mr-2"><i class="fas fa-link"></i> Voir le produit </a>
+                            <span class="product-price">{{ (product.price/100)|number_format('2', ',', ' ') }}€</span>
+                        </div>
+                    </div>
+                </div>         
+                <hr class="featurette-divider">       
+                {% endfor %}
+                <hr class="featurette-divider">    
+            </div>
+        </div>
+
+    </div>
+    
+</div>
+{% endblock %}

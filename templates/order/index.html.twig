@@ -1,0 +1,263 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réglement de l'achat{% endblock %}
+
+{% block css %}
+    <link href="{{ asset("/assets/css/paiement.css") }}" rel="stylesheet">    
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 p-0">
+    <nav class="command navbar navbar-expand-lg navbar-light bg-white pt-3 px-md-4 px-2">
+        <div class="container-fluid"> <a class="navbar-brand" href="#">Bon de commande</a> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="d-flex mb-0">
+                    <li class="nav-item pe-3">
+                        <div class="d-flex align-items-center">
+                            <div class="icon me-3 mr-1"> <span class="fas fa-shopping-cart"></span> </div>
+                            <div class="cart">
+                                <p class="">Panier</p> 
+                                    <small class="">
+                                    {% set len = products|length %}
+                                    {% if len == 0 %}
+                                        Vide    
+                                    {% else %}
+                                        {{ products|length }} élément(s)
+                                    {% endif %}
+                                        
+                                    </small>
+                            </div>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="row px-md-4 px-2 pt-4">
+        <div class="col-lg-8">
+            <p class="pb-2 fw-bold">Votre commande</p>
+            <div class="card">
+                <div class="ribbon ribbon-top-right"><span> ACHATS !</span></div>
+                <div>
+                    <div class="table-responsive px-md-4 px-2 pt-3">
+                        <table class="table table-borderless">
+                            <tbody>       
+                                {% set total = 0 %}                                                             
+                                {% for p in products %}
+                                <tr class="border-bottom">
+                                    <td> 
+                                        <div class="d-flex align-items-center">
+                                            <div> <img class="pic" src="{{ asset(p.p.illustrationPath ) }}" alt="{{ p.p.name }}"> </div>
+                                            <div class="ps-3 d-flex flex-column justify-content">
+                                                <p class="fw-bold">
+                                                    Détail&nbsp;
+                                                    <span class="ps-1">{{ p.p.name }}</span>
+                                                    <span class="ps-1">{{ p.p.category.name}} </span></p> 
+                                                    <small class=" d-flex"> 
+                                                        <span class=" text-muted">Desc :&nbsp;</span> 
+                                                        <span class=" fw-bold">{{ p.p.subtitle }}</span> 
+                                                    </small> 
+
+                                            </div>
+                                        </div>    
+                                    </td>                                    
+                                    <td>
+                                        <div class="d-flex">
+                                            <p class="pe-3">
+                                                <span class="red">
+                                                    {{ (p.total_item/100)|number_format('2', ',', ' ') }}&nbsp;€
+                                                </span>
+                                            </p>
+                                            &nbsp;|&nbsp;
+                                            <p class="text-muted text-decoration-line-through">
+                                                {{ (p.p.price/100)|number_format('2', ',', ' ') }}&nbsp;€
+                                            </p>
+                                        </div>
+                                    </td>                                   
+                                    <td>
+                                        <div class="d-flex align-items-center"> 
+                                            <span class="pe-3 text-muted">Qté&nbsp;</span> 
+                                            <span class="pe-3"> 
+                                                <input class="ps-2" disabled value="{{ p.qty }}" />
+                                            </span>
+                                            &nbsp;
+                                            <div class="round"> 
+                                                <span class=""> L </span> 
+                                            </div>
+                                        </div>
+                                    </td>  
+                                </tr>       
+                                    {% set total = total + p.total_item %}                                                               
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 payment-summary">
+            <p class="fw-bold pt-lg-0 pt-4 pb-2">Récapitulatif</p>
+            <div class="card px-md-3 px-2 pt-4">
+                <div class="unregistered mb-4"> <span class="py-1">{{ app.user.firstname }} {{ app.user.lastname }}</span> </div>
+                <div class="d-flex justify-content-between pb-3"> <small class="text-muted">Transaction code</small>
+                    <p class="">VC115665</p>
+                </div>
+                <div class="d-flex justify-content-between b-bottom"> <input type="text" class="ps-2" placeholder="COUPON CODE">
+                    <div class="btn btn-primary">Apply</div>
+                </div>
+                <div class="d-flex flex-column b-bottom">
+                    <div class="d-flex justify-content-between py-3"> <small class="text-muted">Nombre de produits</small>
+                        <p>{{ products|length }}</p>
+                    </div>
+                    <div class="d-flex justify-content-between"> <small class="text-muted">Total commande</small>
+                        <p>{{ (total/100)|number_format('2', ',', ' ') }}&nbsp;€</p>
+                    </div>
+                </div>
+                <div class="sale my-3"> 
+                    <span>sale<span class="px-1">expiring</span><span>in</span>:</span><span class="red">21<span class="ps-1">hours</span>,31<span class="ps-1 ">minutes</span></span> 
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-8">
+            {{ form_start(form, {action:path('app_order_recap')}) }}        
+            <div class="container px-3 py-1 mb-4" style="background-color: lightgray;">
+
+
+                    <p class="pt-4 font-weight-bold pb-1 ps-2">Choisir une adresse&nbsp;<a href="{{ path('app_account_adress_add') }}">Ajouter une adresse</a></p> 
+                    
+                    <div class="row">            
+                        {% for adress in form.adresses %}
+                            <div class="col col-4">
+                                {% set adressHtml %}
+                                    {{ form_widget(adress) }}
+                                {% endset %}
+                                {{ adressHtml|replace({'[br]': '<br>'})|raw }}  
+                            </div>
+                        {% endfor %}
+                    </div>
+                        
+                    <p class="pt-4 font-weight-bold pb-1 ps-2">Transporteur</p>   
+                    <div class="row my-1">
+        
+                        {% for carrier in form.carriers %}
+                            <div class="col col-2 py-1">
+                                {% set carrierHtml %}
+                                    {{ form_widget(carrier) }}
+                                {% endset %}
+                                {{ carrierHtml|replace({'[br]': '<br>'})|raw }}                        
+                            </div>            
+                        {% endfor %}    
+                    </div>
+
+            </div>  
+            {{ form_end(form) }}                  
+        </div>
+    </div>
+
+</div>     
+
+
+{% endblock %}
+
+{#
+        <div class="col-lg-8 delivery px-md-3 px-1">
+            <p class="pt-4 fw-bold pb-3 ps-2">Delivery</p>
+            <div class="d-md-flex justify-content-between align-items-center pb-4">
+                <div class="size d-flex ps-4"> <label class="option d-flex align-items-center"> <input type="radio" name="radio">
+                        <div class="card">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center"> <img class="del" src="https://www.freepnglogos.com/uploads/ups-logo-transparent/ups-airlines-aviation-22.png" alt="">
+                                    <p class="ps-2">DPD</p>
+                                </div>
+                                <div class=" d-flex flex-column px-3">
+                                    <p class="fw-bold pb-1">DPD<span>Deliveries</span></p> <small class="text-muted pb-1">Expected<span class="ps-1">delivery:</span></small> <small class="text-muted pb-1">Friday:28</small>
+                                </div>
+                                <p class="fw-bold">$5.25</p>
+                            </div>
+                        </div> <span class="checkmark"></span>
+                    </label> </div>
+                <div class="size d-flex pt-md-0 pt-3 ps-md-0 ps-4"> <label class="option d-flex align-items-center"> <input type="radio" name="radio">
+                        <div class="card">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center"> <img class="del" src="https://www.freepnglogos.com/uploads/ups-logo-transparent/ups-airlines-aviation-22.png" alt="">
+                                    <p class="ps-2">DPD</p>
+                                </div>
+                                <div class=" d-flex flex-column px-3">
+                                    <p class="fw-bold pb-1">DPD<span>Deliveries</span></p> <small class="text-muted pb-1">Expected<span class="ps-1">delivery:</span></small> <small class="text-muted pb-1">Friday:28</small>
+                                </div>
+                                <p class="fw-bold">$5.25</p>
+                            </div>
+                        </div> <span class="checkmark"></span>
+                    </label> </div>
+            </div>
+            <div class="d-md-flex justify-content-between align-items-center pb-4">
+                <div class="size d-flex ps-4"> <label class="option d-flex align-items-center"> <input type="radio" name="radio">
+                        <div class="card">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center"> <img class="del" src="https://www.freepnglogos.com/uploads/ups-logo-transparent/ups-airlines-aviation-22.png" alt="">
+                                    <p class="ps-2">DPD</p>
+                                </div>
+                                <div class=" d-flex flex-column px-3">
+                                    <p class="fw-bold pb-1">DPD<span>Deliveries</span></p> <small class="text-muted pb-1">Expected<span class="ps-1">delivery:</span></small> <small class="text-muted pb-1">Friday:28</small>
+                                </div>
+                                <p class="fw-bold">$5.25</p>
+                            </div>
+                        </div> <span class="checkmark"></span>
+                    </label> </div>
+                <div class="size d-flex pt-md-0 pt-3 ps-md-0 ps-4"> <label class="option d-flex align-items-center"> <input type="radio" name="radio">
+                        <div class="card">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center"> <img class="del" src="https://www.freepnglogos.com/uploads/ups-logo-transparent/ups-airlines-aviation-22.png" alt="">
+                                    <p class="ps-2">DPD</p>
+                                </div>
+                                <div class=" d-flex flex-column px-3">
+                                    <p class="fw-bold pb-1">DPD<span>Deliveries</span></p> <small class="text-muted pb-1">Expected<span class="ps-1">delivery:</span></small> <small class="text-muted pb-1">Friday:28</small>
+                                </div>
+                                <p class="fw-bold">$5.25</p>
+                            </div>
+                        </div> <span class="checkmark"></span>
+                    </label> </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <p class="pt-4 fw-bold pb-3">Additional Service</p>
+            <div class="card p-3 mb-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="fw-bold">Care + package</p> <small class="text-muted">One year of additional Care</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <p class="pe-3">$10.00</p>
+                        <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="SwitchCheck"> </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-3 mb-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="fw-bold">Environment Friendly</p> <small class="text-muted">Add some tip for earth care</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <p class="pe-3">$2.00</p>
+                        <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="SwitchCheck"> </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-3 mb-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="fw-bold">Golden Guard</p> <small class="text-muted">30 days more for return</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <p class="pe-3">$5.00</p>
+                        <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="SwitchCheck"> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+#}

@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vos commandes - {% endblock %}
+
+{% block content %}
+
+
+<div class="container">
+    <h1>Vos commandes ✅</h1>
+
+
+    {% if orders|length == 0 %}
+
+        <div class="alert alert-info">Vous n'avez passé aucune commande.</div>
+    
+    {% else %}
+        <div class="row">
+            <div class="col col-3 text-center font-italic border-bottom border-success ">Date</div>
+            <div class="col col-3 text-center font-itali border-bottom border-success ">Montant</div>        
+            <div class="col col-3 text-center font-italic border-bottom border-success ">Référence</div>
+            <div class="col col-3 text-center font-italic border-bottom border-success ">Statut</div>            
+        </div>
+        {% for order in orders %}
+        <div class="row">
+            <div class="col col-3 text-center">{{ order.createdAt|date("m/d/Y")}}</div>
+            <div class="col col-3 font-weight-bold text-right">{{ ((order.total + order.carrierPrice)/100)|number_format(2, ',', ' ') }} €</div>        
+            <div class="col col-3 text-center">{{ order.reference }}</div>
+            <div class="col col-3 text-center">
+                {% if order.state == 1 %}
+                    <span class="badge badge-success">Payée</span>
+                {% else %}
+                    <span class="badge badge-info">Expédiée</span>
+                {% endif %}
+                
+            </div>            
+        </div>        
+        {% endfor %}
+    {% endif %}
+    
+    
+
+
+
+{% endblock %}
